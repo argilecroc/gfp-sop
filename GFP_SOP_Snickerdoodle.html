@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GFP — Snickerdoodle</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand:   #c45c1a;
+      --brand-l: #fff3e6;
+      --border:  #e8c9a0;
+      --bg:      #fdf8f2;
+      --card:    #ffffff;
+      --text:    #1e1206;
+      --mid:     #4a3010;
+      --soft:    #7a5c3a;
+      --prep:    #e07b1a;
+      --build:   #c9951a;
+      --chill:   #3a7fa5;
+      --bake:    #b83a2e;
+      --done:    #3a8a4a;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    /* ── PAGE ── */
+    .page { max-width: 780px; margin: 0 auto; padding: 32px 20px 80px; }
+
+    /* ── HEADER ── */
+    .header { border-top: 4px solid var(--brand); padding-top: 24px; margin-bottom: 24px; }
+    .brand-tag { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--brand); margin-bottom: 6px; }
+    h1 { font-family: Georgia, serif; font-size: 2.2rem; line-height: 1.15; margin-bottom: 6px; }
+    .subtitle { font-size: 0.95rem; color: var(--soft); margin-bottom: 16px; }
+
+    .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+    .badge { background: var(--brand-l); border: 1px solid var(--border); border-radius: 20px; font-size: 0.75rem; font-weight: 600; color: #7a4a1e; padding: 4px 12px; }
+
+    .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-bake { background: var(--brand); color: white; border: none; border-radius: 10px; padding: 14px 24px; font-size: 1rem; font-weight: 700; cursor: pointer; flex: 1; min-width: 160px; }
+    .btn-bake:hover { background: #a34a10; }
+    .btn-print { background: white; color: var(--brand); border: 2px solid var(--brand); border-radius: 10px; padding: 12px 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+
+    /* ── CALLOUT ── */
+    .callout { background: var(--brand-l); border-left: 4px solid var(--brand); border-radius: 0 8px 8px 0; padding: 14px 18px; margin-bottom: 24px; font-size: 0.9rem; color: var(--mid); }
+
+    /* ── TABS ── */
+    .tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 24px; }
+    .tab-btn { background: none; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; padding: 10px 18px; font-size: 0.88rem; font-weight: 600; color: var(--soft); cursor: pointer; transition: color .15s; }
+    .tab-btn.active { color: var(--brand); border-bottom-color: var(--brand); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── SECTION TITLE ── */
+    .sec-title { font-family: Georgia, serif; font-size: 1.1rem; border-bottom: 2px solid var(--border); padding-bottom: 6px; margin-bottom: 14px; }
+
+    /* ── INGREDIENT TABLE ── */
+    table { width: 100%; border-collapse: collapse; font-size: 0.87rem; margin-bottom: 28px; }
+    thead tr { background: var(--brand); color: white; }
+    thead th { text-align: left; padding: 9px 12px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: .04em; }
+    .cat-row td { background: var(--brand-l); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #7a4a1e; padding: 7px 12px; border-bottom: 1px solid var(--border); }
+    tbody tr:not(.cat-row) { border-bottom: 1px solid #f0e0cc; }
+    tbody tr:not(.cat-row):hover { background: #fffaf4; }
+    td { padding: 9px 12px; vertical-align: middle; }
+    td:first-child { width: 30px; text-align: center; }
+    .hi { color: var(--brand); font-weight: 600; }
+    input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--brand); cursor: pointer; }
+
+    /* ── FULL VIEW STEP CARDS ── */
+    .steps-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+    .step-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .step-head { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-bottom: 1px solid #f0e0cc; flex-wrap: wrap; }
+    .sec-badge { color: white; font-size: 0.67rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; border-radius: 4px; padding: 3px 8px; flex-shrink: 0; }
+    .step-n { font-size: 0.73rem; font-weight: 700; color: var(--soft); white-space: nowrap; }
+    .step-t { font-weight: 700; font-size: 0.93rem; }
+    .step-b { padding: 11px 16px; font-size: 0.87rem; color: var(--mid); }
+    .step-extras { padding: 6px 16px 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .tip-tag { font-size: 0.77rem; background: var(--brand-l); color: #7a4a1e; border-radius: 4px; padding: 4px 10px; }
+    .photo-tag { font-size: 0.77rem; background: #e8f4e8; color: #2a5a2a; border: 1px solid #b0d4b0; border-radius: 4px; padding: 4px 10px; font-weight: 600; }
+
+    /* ── NOTES GRID ── */
+    .notes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-bottom: 28px; }
+    .note-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+    .note-ttl { font-size: 0.71rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; color: var(--brand); margin-bottom: 5px; }
+    .note-b { font-size: 0.84rem; color: var(--mid); }
+
+    /* ── SHOT LIST ── */
+    .shots-list { display: flex; flex-direction: column; gap: 12px; }
+    .shot-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; display: flex; gap: 14px; }
+    .shot-num { background: var(--brand); color: white; border-radius: 50%; width: 30px; height: 30px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; }
+    .shot-ttl { font-weight: 700; font-size: 0.95rem; margin-bottom: 3px; }
+    .shot-when { font-size: 0.73rem; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+    .shot-how { font-size: 0.85rem; color: var(--mid); margin-bottom: 5px; }
+    .shot-why { font-size: 0.78rem; color: var(--soft); font-style: italic; }
+
+    /* ── CAPTION BANK ── */
+    .cap-section { margin-bottom: 22px; }
+    .cap-section-ttl { font-size: 0.73rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--brand); margin-bottom: 8px; }
+    .cap-box { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; font-size: 0.89rem; color: var(--mid); margin-bottom: 10px; }
+    .flavor-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    .flavor-tag { background: var(--brand-l); border: 1px solid var(--border); border-radius: 20px; font-size: 0.8rem; color: #7a4a1e; padding: 4px 12px; }
+    .cap-starter { background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--brand); border-radius: 0 10px 10px 0; padding: 14px 16px; font-size: 0.88rem; color: var(--text); margin-bottom: 10px; }
+
+    /* ── FOOTER ── */
+    .footer { margin-top: 48px; border-top: 2px solid var(--border); padding-top: 14px; font-size: 0.72rem; color: #b09070; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px; }
+
+    /* ════════════════════════════════
+       BAKE MODE OVERLAY
+    ════════════════════════════════ */
+    #bake-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 1000; flex-direction: column; }
+    #bake-overlay.active { display: flex; }
+
+    .bake-top { background: white; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .bake-top-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 10px; }
+    .bake-brand-tag { font-size: 0.73rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--brand); }
+    .bake-exit { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 7px 16px; font-size: 0.82rem; font-weight: 600; color: var(--soft); cursor: pointer; }
+    .bake-prog-wrap { padding: 0 18px 12px; }
+    .bake-prog-label { font-size: 0.72rem; font-weight: 600; color: var(--soft); margin-bottom: 5px; }
+    .bake-prog-bg { height: 8px; background: #f0e0cc; border-radius: 4px; overflow: hidden; }
+    .bake-prog-fill { height: 100%; border-radius: 4px; background: var(--brand); transition: width .35s ease, background .35s ease; }
+
+    .bake-body { flex: 1; overflow-y: auto; padding: 22px 18px 8px; }
+    .bake-card { max-width: 560px; margin: 0 auto; }
+
+    .bake-sec-badge { display: inline-block; color: white; font-size: 0.7rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; border-radius: 5px; padding: 4px 10px; margin-bottom: 10px; }
+    .bake-step-n { font-size: 0.78rem; font-weight: 600; color: var(--soft); margin-bottom: 3px; }
+    .bake-step-title { font-family: Georgia, serif; font-size: 1.65rem; line-height: 1.2; margin-bottom: 14px; }
+    .bake-step-body { font-size: 1rem; color: var(--mid); line-height: 1.65; margin-bottom: 16px; }
+
+    .bake-timer-btn {
+      display: block; width: 100%; padding: 16px;
+      background: var(--brand-l); border: 2px solid var(--brand); border-radius: 10px;
+      font-size: 1rem; font-weight: 700; color: var(--brand); cursor: pointer;
+      text-align: center; margin-bottom: 12px; transition: background .2s, color .2s;
+    }
+    .bake-timer-btn.running { background: var(--brand); color: white; }
+    .bake-timer-btn.done-timer { background: var(--done); border-color: var(--done); color: white; }
+
+    .bake-photo { background: #e8f4e8; border: 1px solid #b0d4b0; border-radius: 8px; padding: 12px 14px; font-size: 0.87rem; color: #1e4a1e; margin-bottom: 12px; }
+    .bake-photo strong { display: block; margin-bottom: 3px; }
+
+    .bake-tip { background: var(--brand-l); border-radius: 6px; padding: 10px 14px; font-size: 0.85rem; color: var(--mid); margin-bottom: 12px; }
+
+    /* Ingredient checklist in bake mode */
+    .bake-ing-cat { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; color: var(--brand); padding: 10px 0 4px; }
+    .bake-ing-row { display: flex; align-items: center; gap: 10px; background: white; border: 1px solid var(--border); border-radius: 8px; padding: 11px 14px; margin-bottom: 6px; }
+    .bake-ing-name { font-weight: 600; font-size: 0.92rem; flex: 1; }
+    .bake-ing-amt { font-size: 0.8rem; color: var(--soft); white-space: nowrap; }
+    .bake-ing-note { font-size: 0.74rem; color: var(--brand); font-weight: 600; }
+
+    /* Done screen */
+    .bake-done { text-align: center; padding: 48px 24px; max-width: 400px; margin: 0 auto; }
+    .bake-done-emoji { font-size: 3rem; margin-bottom: 16px; }
+    .bake-done-title { font-family: Georgia, serif; font-size: 1.8rem; margin-bottom: 10px; }
+    .bake-done-body { font-size: 0.95rem; color: var(--mid); line-height: 1.65; }
+
+    /* Nav buttons */
+    .bake-nav { background: white; border-top: 1px solid var(--border); padding: 14px 18px; display: flex; gap: 12px; flex-shrink: 0; }
+    .bake-nav-btn { flex: 1; padding: 17px; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; border: 2px solid var(--brand); transition: opacity .15s; }
+    .bake-nav-prev { background: white; color: var(--brand); }
+    .bake-nav-next { background: var(--brand); color: white; }
+    .bake-nav-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+
+    /* ── PRINT ── */
+    @media print {
+      #bake-overlay, .header-actions, .tabs { display: none !important; }
+      .tab-content { display: block !important; }
+      body { background: white; }
+      .page { padding: 20px; }
+      .step-card, .note-card, .shot-card { break-inside: avoid; }
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 480px) {
+      h1 { font-size: 1.8rem; }
+      .bake-step-title { font-size: 1.4rem; }
+      .bake-step-body { font-size: 0.96rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     FULL VIEW PAGE
+══════════════════════════════════════ -->
+<div class="page" id="main-page">
+
+  <div class="header">
+    <div class="brand-tag">Gluten for Punishment · Colorado Springs, CO</div>
+    <h1>The Snickerdoodle</h1>
+    <p class="subtitle">Soft centers, cinnamon crust, a little tang from the sourdough discard. The underdog cookie that always steals the show.</p>
+    <div class="badges">
+      <span class="badge">56g (2oz) per cookie</span>
+      <span class="badge">High-Altitude · 6,200 ft</span>
+      <span class="badge">Bake at 325°F · 10–12 min</span>
+      <span class="badge">60-min chill required</span>
+      <span class="badge">$3 each / $15 per dozen</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn-bake" onclick="enterBakeMode()">▶ Enter Bake Mode</button>
+      <button class="btn-print" onclick="window.print()">🖨 Print</button>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>What makes this one different:</strong> Brown butter + sourdough discard. The butter adds depth, the starter adds that barely-there tang that makes people ask "what IS that?" The cardamom is the secret — don't skip it.
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('recipe', this)">Recipe</button>
+    <button class="tab-btn" onclick="switchTab('shots', this)">Shot List</button>
+    <button class="tab-btn" onclick="switchTab('captions', this)">Caption Bank</button>
+  </div>
+
+  <!-- ── TAB: RECIPE ── -->
+  <div class="tab-content active" id="tab-recipe">
+
+    <h3 class="sec-title">Ingredients</h3>
+    <table>
+      <thead><tr><th>✓</th><th>Ingredient</th><th>Grams</th><th>Volume</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr class="cat-row"><td colspan="5">Wet / Perishables</td></tr>
+        <tr><td><input type="checkbox"></td><td>Unsalted Butter</td><td>226g</td><td>1 cup</td><td>Brown until amber &amp; nutty</td></tr>
+        <tr><td><input type="checkbox"></td><td>Sourdough Discard</td><td>125g</td><td>½ cup</td><td class="hi">Add while butter is still hot</td></tr>
+        <tr><td><input type="checkbox"></td><td>White Sugar</td><td>150g</td><td>¾ cup</td><td></td></tr>
+        <tr><td><input type="checkbox"></td><td>Brown Sugar (light)</td><td>100g</td><td>½ cup packed</td><td></td></tr>
+        <tr><td><input type="checkbox"></td><td>Large Egg</td><td>—</td><td>1</td><td>Room temp</td></tr>
+        <tr><td><input type="checkbox"></td><td>Vanilla Extract</td><td>13g</td><td>1 tbsp</td><td>Pure only</td></tr>
+        <tr class="cat-row"><td colspan="5">Dry / Structure</td></tr>
+        <tr><td><input type="checkbox"></td><td>All-Purpose Flour</td><td>330g</td><td>2¾ cups</td><td>Sifted or whisked</td></tr>
+        <tr><td><input type="checkbox"></td><td>Cream of Tartar</td><td>—</td><td>1½ tsp</td><td>Makes it a snickerdoodle</td></tr>
+        <tr><td><input type="checkbox"></td><td>Baking Soda</td><td>—</td><td>1 tsp</td><td>Check freshness</td></tr>
+        <tr><td><input type="checkbox"></td><td>Baking Powder</td><td>—</td><td>½ tsp</td><td>Altitude-adjusted</td></tr>
+        <tr><td><input type="checkbox"></td><td>Sea Salt</td><td>—</td><td>½ tsp</td><td></td></tr>
+        <tr><td><input type="checkbox"></td><td>Ground Cardamom</td><td>—</td><td>½ tsp</td><td class="hi">The secret. Don't skip it.</td></tr>
+        <tr class="cat-row"><td colspan="5">Coating</td></tr>
+        <tr><td><input type="checkbox"></td><td>White Sugar</td><td>—</td><td>¼ cup</td><td>For rolling</td></tr>
+        <tr><td><input type="checkbox"></td><td>Ground Cinnamon</td><td>—</td><td>1 tbsp</td><td>For rolling</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="sec-title">Steps</h3>
+    <div class="steps-list" id="full-steps"></div>
+
+    <h3 class="sec-title">Notes</h3>
+    <div class="notes-grid">
+      <div class="note-card"><div class="note-ttl">Altitude Adjustment</div><div class="note-b">If cookies crater instead of crinkle, reduce baking powder to ¼ tsp next batch. The dough is already adjusted for 6,200 ft.</div></div>
+      <div class="note-card"><div class="note-ttl">The Chill Is Not Optional</div><div class="note-b">60 minutes minimum. Cold dough holds its shape in the oven long enough to get structure before it spreads.</div></div>
+      <div class="note-card"><div class="note-ttl">The Cardamom</div><div class="note-b">Nobody will name it. But they'll ask what's different. That's the cardamom. ½ tsp is the sweet spot.</div></div>
+      <div class="note-card"><div class="note-ttl">Freezing for Orders</div><div class="note-b">Freeze unbaked, rolled dough balls after the chill. Bake from frozen at 325°F, add 2–3 min. Never freeze finished cookies.</div></div>
+    </div>
+
+  </div><!-- /recipe -->
+
+  <!-- ── TAB: SHOT LIST ── -->
+  <div class="tab-content" id="tab-shots">
+    <div class="callout" style="margin-bottom:20px">
+      <strong>The one rule:</strong> Natural window light, clear counter, phone lens clean. You don't need a setup — you need good light and one subject. Six shots total. You don't have to get them all in one bake.
+    </div>
+    <div class="shots-list" id="shot-list"></div>
+  </div>
+
+  <!-- ── TAB: CAPTION BANK ── -->
+  <div class="tab-content" id="tab-captions">
+
+    <div class="cap-section">
+      <div class="cap-section-ttl">Product Description (reference — use this to write captions)</div>
+      <div class="cap-box">Soft snickerdoodles made with browned butter, sourdough discard, and a touch of cardamom. Cinnamon-sugar crust that cracks when you bite in. Made to order, baked fresh — $3 each or $15 a dozen.</div>
+    </div>
+
+    <div class="cap-section">
+      <div class="cap-section-ttl">Flavor Notes</div>
+      <div class="flavor-tags">
+        <span class="flavor-tag">Cinnamon-forward</span>
+        <span class="flavor-tag">Caramel depth (brown butter)</span>
+        <span class="flavor-tag">Subtle tang (sourdough discard)</span>
+        <span class="flavor-tag">Soft center, slight chew</span>
+        <span class="flavor-tag">Thin crackly crust</span>
+        <span class="flavor-tag">Cardamom warmth (secret)</span>
+      </div>
+    </div>
+
+    <div class="cap-section">
+      <div class="cap-section-ttl">Story Angles — pick one per post</div>
+      <div class="cap-box">
+        <strong>The underdog angle.</strong> Everyone brings chocolate chip. The snickerdoodle shows up, nobody expects anything, and it's the first thing gone.<br><br>
+        <strong>The discard angle.</strong> Sourdough discard in a cookie sounds weird. It adds a barely-there tang that makes people ask what's in it.<br><br>
+        <strong>The altitude angle.</strong> Colorado baker, 6,200 feet, took trial and error. These work.<br><br>
+        <strong>The grandma's kitchen angle.</strong> Soft, warm, cinnamon — the kind of thing somebody's grandma made. Just the slightly fancied-up version.
+      </div>
+    </div>
+
+    <div class="cap-section">
+      <div class="cap-section-ttl">Caption Starters — ready to use or riff on</div>
+      <div class="cap-starter">"The snickerdoodle doesn't get enough credit. It just quietly shows up and outperforms everything else on the plate. Brown butter, sourdough discard, and some cardamom nobody can name but everybody notices. $3 each or $15 a dozen — DM me."</div>
+      <div class="cap-starter">"Unpopular opinion: the snickerdoodle is the best cookie. Nobody thinks so until they eat one of these. Then they want a dozen. You've been warned."</div>
+      <div class="cap-starter">"These have been sitting in the fridge for an hour. Not optional at 6,200 feet. Worth every minute — same as anything worth doing."</div>
+      <div class="cap-starter">"There's cardamom in these. You won't taste it. You'll just think the cinnamon is somehow better than usual. That's the move."</div>
+    </div>
+
+  </div><!-- /captions -->
+
+  <div class="footer">
+    <span>Gluten for Punishment · Colorado Springs, CO · Internal Use Only</span>
+    <span>GFP SOP: Snickerdoodle · Updated March 2026</span>
+  </div>
+</div><!-- /page -->
+
+
+<!-- ══════════════════════════════════════
+     BAKE MODE OVERLAY
+══════════════════════════════════════ -->
+<div id="bake-overlay">
+  <div class="bake-top">
+    <div class="bake-top-row">
+      <div class="bake-brand-tag">GFP · Snickerdoodle</div>
+      <button class="bake-exit" onclick="exitBakeMode()">✕ Exit</button>
+    </div>
+    <div class="bake-prog-wrap">
+      <div class="bake-prog-label" id="prog-label">Ingredients Check</div>
+      <div class="bake-prog-bg"><div class="bake-prog-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="bake-body" id="bake-body"></div>
+
+  <div class="bake-nav">
+    <button class="bake-nav-btn bake-nav-prev" id="btn-prev" onclick="prevStep()">← Back</button>
+    <button class="bake-nav-btn bake-nav-next" id="btn-next" onclick="nextStep()">Next →</button>
+  </div>
+</div>
+
+
+<script>
+// ══════════════════════════════════════
+// DATA
+// ══════════════════════════════════════
+
+const SEC = { PREP:'#e07b1a', BUILD:'#c9951a', CHILL:'#3a7fa5', BAKE:'#b83a2e' };
+
+const STEPS = [
+  // Step 0 — ingredient screen
+  {
+    sec: 'PREP', isIngredients: true,
+    title: 'Gather Your Ingredients',
+    body: 'Get everything out before anything touches heat. Wet stuff on one side, dry on the other. Check off as you go.'
+  },
+  // Step 1
+  {
+    sec: 'PREP', title: 'Brown the Butter',
+    body: 'Medium heat. 5–7 minutes. Stir and watch. It goes from pale yellow → foamy → amber, and smells like toasted hazelnuts. Pull it off the second you hit that nutty smell. Don\'t walk away.',
+    tip: 'You\'ll see brown bits at the bottom. That\'s flavor — don\'t drain them.',
+    photo: { label: '📸 Shot here', note: 'Pan at 45°, catch the amber color and the bubble. Window light behind the pan. Move fast — it changes quick.' }
+  },
+  // Step 2
+  {
+    sec: 'BUILD', title: 'Build the Base',
+    body: 'Pour the hot butter over both sugars. Whisk together. Then add the sourdough discard right now, while the butter is still hot — the heat pulls the starter into the fat. Let it cool 5 minutes.',
+    tip: 'Should look glossy and smell like caramel. That\'s what you want.'
+  },
+  // Step 3
+  {
+    sec: 'BUILD', title: 'Add the Binders',
+    body: 'Beat in the room-temp egg and vanilla. Mix until smooth and glossy — like a caramel sauce. That sheen is what you\'re after.'
+  },
+  // Step 4
+  {
+    sec: 'BUILD', title: 'Fold in the Dry',
+    body: 'Add all dry ingredients and fold until no white streaks remain. Fold — not stir, not beat. You\'ll toughen the dough and lose the soft center if you overmix.',
+    tip: 'Stop the moment the last streak disappears.'
+  },
+  // Step 5
+  {
+    sec: 'CHILL', title: 'Refrigerate — the Full 60 Minutes',
+    body: 'Cover the bowl and put it in the fridge. 60 minutes. At 6,200 feet, skipping this means flat, embarrassing cookies. Set the timer. Use the time.',
+    timer: { total: 3600, label: 'Start 60-Min Chill Timer' },
+    tip: 'Good time to clean up, prep the sheet pan, and mix your cinnamon sugar coating.'
+  },
+  // Step 6
+  {
+    sec: 'BAKE', title: 'Preheat & Mix the Coating',
+    body: 'Set oven to 325°F. Mix ¼ cup white sugar with 1 tbsp ground cinnamon in a small bowl. Have it ready before you start scooping — once you start, you want to move.'
+  },
+  // Step 7
+  {
+    sec: 'BAKE', title: 'Scoop and Double-Roll',
+    body: 'Scoop 56g (2oz) balls. Roll in the cinnamon sugar. Wait 30 seconds — let the first coat absorb a little — then roll again. That second roll is what builds the thick, crackly crust.',
+    photo: { label: '📸 Shot here', note: 'Hands rolling a ball in the cinnamon sugar bowl. Prop your phone or ask someone. Side angle, 45°. You want to see the bowl and the motion.' }
+  },
+  // Step 8
+  {
+    sec: 'BAKE', title: 'Bake',
+    body: '325°F for 10–12 minutes. Edges set, centers look slightly underdone — that\'s right. They finish on the pan. No banging, no moving early.',
+    timer: { total: 660, label: 'Start 11-Min Bake Timer' },
+    tip: 'Domed and crinkled on top = you nailed it.',
+    photo: { label: '📸 Two shots here', note: 'Tray of raw dough balls before the oven — overhead, fill the frame. Then tray coming out — catch the steam if it\'s there. Quick.' }
+  },
+  // Step 9
+  {
+    sec: 'BAKE', title: 'Cool on the Counter',
+    body: 'Move them straight to the counter (not a rack). The counter lets the bottoms finish setting without overcooking. 10 minutes before you move or bag.',
+    photo: { label: '📸 Two shots here', note: 'Overhead right out of the oven while still puffy (first 3 min). Then once cool: stack 3–4 cookies, break one in half to show the inside. Cutting board, natural window light.' }
+  }
+];
+
+const SHOTS = [
+  { title: 'The Ingredient Lineup', when: 'Before you start', how: 'Everything measured into small bowls on a clean counter. Phone directly overhead (flat lay). Window light. Clear everything else — only the ingredients in the frame.', why: 'Shows the from-scratch story. "Mise en place" posts do well.' },
+  { title: 'Brown Butter in the Pan', when: 'Right when you pull it off the heat', how: 'Phone at a 45° angle. Light source behind the pan to catch the amber color and the bubbles. Move fast — it changes.', why: 'Brown butter is visually distinct and people love seeing process. Strong differentiator.' },
+  { title: 'Rolling in Cinnamon Sugar', when: 'During Step 7', how: 'Hands in motion rolling a ball in the bowl. Prop your phone against something or ask someone. Side angle. You want the bowl and the action in frame.', why: 'Motion/action shots get engagement. Shows care and process.' },
+  { title: 'Tray Ready to Go In', when: 'Dough balls lined up, before the oven', how: 'Phone directly overhead. Fill the frame with the tray. Even spacing looks satisfying. Natural or kitchen light.', why: 'Clean, shows consistency and quantity. Good "before" shot.' },
+  { title: 'Fresh Out of the Oven', when: 'Within the first 3 minutes out', how: 'Overhead or slight 45°. Catch the steam if it\'s there. Still on the pan or moved to counter. Don\'t wait — puffiness fades fast.', why: 'The "just baked" moment is your best social content. This is the hero shot.' },
+  { title: 'The Stack — Your Menu Shot', when: 'Once fully cooled (30+ min out)', how: '3–4 cookies stacked slightly off-center. Break one in half to show the soft inside. Natural window light from the side. Phone at eye level or slightly above. Cutting board, white plate, or dish towel — nothing busy behind it.', why: 'This is your "order now" photo. Use it for the menu, pinned posts, and DM replies.' }
+];
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+let cur = 0;
+let timers = {}; // stepIdx → { remaining, running, interval }
+
+// ══════════════════════════════════════
+// TABS
+// ══════════════════════════════════════
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ══════════════════════════════════════
+// RENDER FULL VIEW STEPS
+// ══════════════════════════════════════
+function renderFullSteps() {
+  const cont = document.getElementById('full-steps');
+  STEPS.forEach((s, i) => {
+    if (s.isIngredients) return;
+    const col = SEC[s.sec];
+    let h = `<div class="step-card">
+      <div class="step-head">
+        <span class="sec-badge" style="background:${col}">${s.sec}</span>
+        <span class="step-n">Step ${i}</span>
+        <span class="step-t">${s.title}</span>
+      </div>
+      <div class="step-b">${s.body}</div>`;
+    if (s.tip || s.photo || s.timer) {
+      h += `<div class="step-extras">`;
+      if (s.tip)   h += `<span class="tip-tag">💡 ${s.tip}</span>`;
+      if (s.timer) h += `<span class="tip-tag">⏱ ${s.timer.label}</span>`;
+      if (s.photo) h += `<span class="photo-tag">${s.photo.label} — ${s.photo.note}</span>`;
+      h += `</div>`;
+    }
+    h += `</div>`;
+    cont.innerHTML += h;
+  });
+}
+
+// ══════════════════════════════════════
+// RENDER SHOT LIST
+// ══════════════════════════════════════
+function renderShots() {
+  const cont = document.getElementById('shot-list');
+  SHOTS.forEach((s, i) => {
+    cont.innerHTML += `<div class="shot-card">
+      <div class="shot-num">${i + 1}</div>
+      <div>
+        <div class="shot-ttl">${s.title}</div>
+        <div class="shot-when">When: ${s.when}</div>
+        <div class="shot-how">${s.how}</div>
+        <div class="shot-why">Why it works: ${s.why}</div>
+      </div>
+    </div>`;
+  });
+}
+
+// ══════════════════════════════════════
+// BAKE MODE
+// ══════════════════════════════════════
+function enterBakeMode() {
+  cur = 0;
+  document.getElementById('bake-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  renderStep();
+}
+
+function exitBakeMode() {
+  document.getElementById('bake-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+  Object.values(timers).forEach(t => clearInterval(t.interval));
+  timers = {};
+}
+
+function nextStep() {
+  if (cur <= STEPS.length - 1) { cur++; renderStep(); }
+}
+function prevStep() {
+  if (cur > 0) { cur--; renderStep(); }
+}
+
+function renderStep() {
+  const body  = document.getElementById('bake-body');
+  const pFill = document.getElementById('prog-fill');
+  const pLbl  = document.getElementById('prog-label');
+  const prev  = document.getElementById('btn-prev');
+  const next  = document.getElementById('btn-next');
+
+  body.scrollTop = 0;
+
+  const total = STEPS.length; // 0–9 = 10 steps
+  const isDone = cur >= total;
+
+  // Progress
+  const pct = isDone ? 100 : (cur / (total - 1)) * 100;
+  pFill.style.width = pct + '%';
+  pFill.style.background = isDone ? '#3a8a4a' : (SEC[STEPS[Math.min(cur, total-1)].sec] || '#c45c1a');
+
+  if (isDone) {
+    pLbl.textContent = 'Done 🎉';
+  } else if (cur === 0) {
+    pLbl.textContent = 'Ingredients Check';
+  } else {
+    pLbl.textContent = `Step ${cur} of ${total - 1}`;
+  }
+
+  prev.disabled = cur === 0;
+  next.disabled = isDone;
+  next.textContent = cur === total - 1 ? '✓ Finish' : 'Next →';
+
+  // Done screen
+  if (isDone) {
+    body.innerHTML = `<div class="bake-done">
+      <div class="bake-done-emoji">🍪</div>
+      <div class="bake-done-title">That's a bake.</div>
+      <div class="bake-done-body">Counter cool for 10 minutes — no rack needed. The bottoms are still setting. They're worth the wait.<br><br>Don't forget to grab that stack shot while they're still fresh.</div>
+    </div>`;
+    return;
+  }
+
+  const s   = STEPS[cur];
+  const col = SEC[s.sec];
+
+  // Ingredient screen
+  if (s.isIngredients) {
+    const groups = {
+      'Wet / Perishables': [
+        { n:'Unsalted Butter', a:'226g / 1 cup', note:'Will brown' },
+        { n:'Sourdough Discard', a:'125g / ½ cup', note:'⚑ Add while hot', hi:true },
+        { n:'White Sugar', a:'150g / ¾ cup', note:'' },
+        { n:'Brown Sugar', a:'100g / ½ cup packed', note:'' },
+        { n:'Large Egg', a:'1', note:'Room temp' },
+        { n:'Vanilla Extract', a:'13g / 1 tbsp', note:'Pure only' }
+      ],
+      'Dry / Structure': [
+        { n:'All-Purpose Flour', a:'330g / 2¾ cups', note:'' },
+        { n:'Cream of Tartar', a:'1½ tsp', note:'' },
+        { n:'Baking Soda', a:'1 tsp', note:'' },
+        { n:'Baking Powder', a:'½ tsp', note:'' },
+        { n:'Sea Salt', a:'½ tsp', note:'' },
+        { n:'Ground Cardamom', a:'½ tsp', note:'⚑ Secret', hi:true }
+      ],
+      'Coating': [
+        { n:'White Sugar', a:'¼ cup', note:'' },
+        { n:'Ground Cinnamon', a:'1 tbsp', note:'' }
+      ]
+    };
+
+    let h = `<div class="bake-card">
+      <span class="bake-sec-badge" style="background:${col}">PREP</span>
+      <div class="bake-step-n">Before You Start</div>
+      <div class="bake-step-title">${s.title}</div>
+      <div class="bake-step-body">${s.body}</div>`;
+
+    for (const [cat, items] of Object.entries(groups)) {
+      h += `<div class="bake-ing-cat">${cat}</div>`;
+      items.forEach((ing, idx) => {
+        const uid = `bi-${cur}-${idx}`;
+        h += `<div class="bake-ing-row">
+          <input type="checkbox" id="${uid}" style="accent-color:#c45c1a;width:18px;height:18px;flex-shrink:0">
+          <label class="bake-ing-name" for="${uid}">${ing.n}</label>
+          <span class="bake-ing-amt">${ing.a}</span>
+          ${ing.note ? `<span class="bake-ing-note">${ing.note}</span>` : ''}
+        </div>`;
+      });
+    }
+
+    h += `</div>`;
+    body.innerHTML = h;
+    return;
+  }
+
+  // Regular step
+  const tid = `t${cur}`;
+  let h = `<div class="bake-card">
+    <span class="bake-sec-badge" style="background:${col}">${s.sec}</span>
+    <div class="bake-step-n">Step ${cur} of ${total - 1}</div>
+    <div class="bake-step-title">${s.title}</div>
+    <div class="bake-step-body">${s.body}</div>`;
+
+  if (s.timer) {
+    const existing = timers[cur];
+    const rem = existing ? existing.remaining : s.timer.total;
+    const m = Math.floor(rem / 60);
+    const sec = rem % 60;
+    const disp = `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    const cls = (existing && existing.running) ? 'bake-timer-btn running' : 'bake-timer-btn';
+    h += `<button class="${cls}" id="${tid}-btn" onclick="toggleTimer(${cur}, ${s.timer.total}, '${tid}')">
+      ⏱ ${disp} — ${s.timer.label}
+    </button>`;
+  }
+
+  if (s.photo) {
+    h += `<div class="bake-photo"><strong>${s.photo.label}</strong>${s.photo.note}</div>`;
+  }
+
+  if (s.tip) {
+    h += `<div class="bake-tip">💡 ${s.tip}</div>`;
+  }
+
+  h += `</div>`;
+  body.innerHTML = h;
+
+  // Restore running timer display if re-visiting step
+  if (timers[cur] && timers[cur].running) {
+    const b = document.getElementById(`${tid}-btn`);
+    if (b) b.classList.add('running');
+  }
+}
+
+// ══════════════════════════════════════
+// TIMERS
+// ══════════════════════════════════════
+function toggleTimer(stepIdx, total, tid) {
+  const btn = document.getElementById(`${tid}-btn`);
+  if (!btn) return;
+
+  if (!timers[stepIdx]) {
+    timers[stepIdx] = { remaining: total, running: false, interval: null };
+  }
+
+  const t = timers[stepIdx];
+
+  if (t.running) {
+    clearInterval(t.interval);
+    t.running = false;
+    btn.classList.remove('running');
+    const m = Math.floor(t.remaining / 60), s = t.remaining % 60;
+    btn.textContent = `⏸ ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} — Paused. Tap to resume`;
+  } else {
+    t.running = true;
+    btn.classList.add('running');
+    t.interval = setInterval(() => {
+      t.remaining--;
+      const m = Math.floor(t.remaining / 60), s = t.remaining % 60;
+      const b = document.getElementById(`${tid}-btn`);
+      if (b) b.textContent = `⏱ ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} — Tap to pause`;
+
+      if (t.remaining <= 0) {
+        clearInterval(t.interval);
+        t.running = false;
+        const b2 = document.getElementById(`${tid}-btn`);
+        if (b2) {
+          b2.textContent = "✓ Time's up!";
+          b2.className = 'bake-timer-btn done-timer';
+        }
+        if (navigator.vibrate) navigator.vibrate([600, 200, 600, 200, 600]);
+      }
+    }, 1000);
+  }
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+renderFullSteps();
+renderShots();
+</script>
+</body>
+</html>
